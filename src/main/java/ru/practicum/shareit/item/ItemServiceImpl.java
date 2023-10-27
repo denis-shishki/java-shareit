@@ -21,18 +21,21 @@ public class ItemServiceImpl implements ItemService {
     private final UserService userService;
 
     @Override
-    public ItemDto createItem(Item item, int userId) {
+    public ItemDto createItem(ItemDto itemDto, int userId) {
         userService.checkUser(userId);
+        Item item = ItemMapper.toItem(itemDto);
+
         checkValidateItem(item);
         item.setOwnerId(userId);
         return ItemMapper.toItemDto(itemStorage.createItem(item));
     }
 
     @Override
-    public ItemDto updateItem(Item item, int userId, int itemId) {
+    public ItemDto updateItem(ItemDto itemDto, int userId, int itemId) {
         userService.checkUser(userId);
         checkItemByUser(userId, itemId);
-        item.setOwnerId(userId);
+        itemDto.setOwnerId(userId);
+        Item item = ItemMapper.toItem(itemDto);
 
         if (item.getName() != null) itemStorage.updateNameItem(itemId, item.getName());
         if (item.getDescription() != null) itemStorage.updateDescriptionItem(itemId, item.getDescription());
@@ -66,7 +69,7 @@ public class ItemServiceImpl implements ItemService {
 
     private void checkItemByUser(int userId, int itemId) {
         List<Item> itemsByUser = itemStorage.findAllItemForOwner(userId);
-        //  if (itemsByUser == null) new NotFoundException("Запрашиваемая вещь отсутствует у пользователя");
+
         Item findItem = itemsByUser.stream()
                 .filter(item -> item.getId() == itemId)
                 .findFirst()

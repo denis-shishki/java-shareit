@@ -19,16 +19,17 @@ public class UserServiceImpl implements UserService {
 
     private final UserStorage userStorage;
 
-    public UserDto createUser(User user) {
+    public UserDto createUser(UserDto userDto) {
+        User user = UserMapper.toUser(userDto);
         validateUser(user);
         checkUniquenessEmail(user);
         return UserMapper.toUserDto(userStorage.createUser(user));
     }
 
-    public UserDto updateUser(User user, int userId) {
+    public UserDto updateUser(UserDto userDto, int userId) {
         checkUser(userId);
-        user.setId(userId);
-
+        userDto.setId(userId);
+        User user = UserMapper.toUser(userDto);
         if (user.getName() != null && user.getEmail() != null) {
             return UserMapper.toUserDto(userStorage.updateUser(user));
         }

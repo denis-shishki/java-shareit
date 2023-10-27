@@ -14,4 +14,15 @@ public abstract class ItemMapper {
                 .itemRequest(item.getItemRequest())
                 .build();
     }
+
+    public static Item toItem(ItemDto itemDto) {
+        return Item.builder()
+                .id(itemDto.getId())
+                .ownerId(itemDto.getOwnerId())
+                .name(itemDto.getName())
+                .description(itemDto.getDescription())
+                .available(itemDto.getAvailable())
+                .itemRequest(itemDto.getItemRequest())
+                .build();
+    }
 }

@@ -8,9 +8,9 @@ import ru.practicum.shareit.request.ItemRequest;
 @Data
 public class ItemDto {
     private final int id;
-    private final Integer ownerId;
+    private Integer ownerId;
     private final String name;
     private final String description;
-    private final boolean available;
+    private final Boolean available;
     private final ItemRequest itemRequest;
 }
