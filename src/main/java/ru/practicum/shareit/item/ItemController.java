@@ -2,7 +2,9 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
 
 import java.util.List;
 
@@ -13,27 +15,32 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping()
-    public ItemDto createItem(@RequestBody ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") int userId) {
+    public ItemDto createItem(@RequestBody ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.createItem(itemDto, userId);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestBody ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") int userId, @PathVariable int itemId) {
+    public ItemDto updateItem(@RequestBody ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long itemId) {
         return itemService.updateItem(itemDto, userId, itemId);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto findItem(@PathVariable int itemId) {
-        return itemService.findItem(itemId);
+    public ItemWithBookingsDto findItem(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long userId) {
+        return itemService.findItem(itemId, userId);
     }
 
     @GetMapping
-    public List<ItemDto> findAllItemForOwner(@RequestHeader("X-Sharer-User-Id") int userId) {
-        return itemService.findAllItemForOwner(userId); // может здесь отдавать полноценный Item? Владельцу же отправляем
+    public List<ItemWithBookingsDto> findAllItemForOwner(@RequestHeader("X-Sharer-User-Id") long userId) {
+        return itemService.findAllItemForOwner(userId);
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchAvailableItem(@RequestParam String text) {
         return itemService.searchAvailableItem(text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto createComment(@RequestBody CommentDto commentDto, @RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
+        return itemService.createComment(commentDto, userId, itemId);
     }
 }

@@ -2,85 +2,69 @@ package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.NotFoundException;
-import ru.practicum.shareit.exceptions.NotUniqueEmailException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
-@RestController
+@Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
 
     public UserDto createUser(UserDto userDto) {
         User user = UserMapper.toUser(userDto);
         validateUser(user);
-        checkUniquenessEmail(user);
-        return UserMapper.toUserDto(userStorage.createUser(user));
+        return UserMapper.toUserDto(userRepository.save(user));
     }
 
-    public UserDto updateUser(UserDto userDto, int userId) {
-        checkUser(userId);
+    public UserDto updateUser(UserDto userDto, long userId) {
+        checkExistUser(userId);
         userDto.setId(userId);
-        User user = UserMapper.toUser(userDto);
-        if (user.getName() != null && user.getEmail() != null) {
-            return UserMapper.toUserDto(userStorage.updateUser(user));
+        User userUpdate = UserMapper.toUser(userDto);
+        User user = Optional.of(userRepository.findById(userId)).get().orElseThrow();
+
+        if (userUpdate.getName() != null) {
+            user.setName(userUpdate.getName());
         }
-        if (user.getName() != null) {
-            userStorage.updateUserName(userId, user.getName());
-        } else if (user.getEmail() != null) {
-            checkUniquenessEmail(user);
-            userStorage.updateUserEmail(userId, user.getEmail());
+        if (userUpdate.getEmail() != null) {
+            if (!userUpdate.getEmail().contains("@"))
+                throw new ValidationException("Электронная почта указана некорректно");
+            user.setEmail(userUpdate.getEmail());
         }
 
-        return UserMapper.toUserDto(userStorage.findUser(userId));
+        return UserMapper.toUserDto(userRepository.save(user));
+
     }
 
-    public void deleteUser(int id) {
-        checkUser(id);
-        userStorage.deleteUser(id);
+    public void deleteUser(long id) {
+        checkExistUser(id);
+        userRepository.deleteById(id);
     }
 
     @Override
-    public UserDto findUser(int id) {
-        return UserMapper.toUserDto(userStorage.findUser(id));
+    public UserDto findUser(long id) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isEmpty()) throw new NotFoundException("Пользователь с заданным id не найден");
+        return UserMapper.toUserDto(userOptional.get());
     }
 
     @Override
     public List<UserDto> findAllUsers() {
-        return userStorage.findAllUsers().stream()
+        return userRepository.findAll().stream()
                 .map(UserMapper::toUserDto)
                 .collect(Collectors.toList());
     }
 
-    public void checkUser(int id) {
-        User user = userStorage.findUser(id);
-        if (user == null) throw new NotFoundException("Данный пользователь не найден");
-    }
-
-    private void checkUniquenessEmail(User user) {
-        List<User> users = userStorage.findAllUsers();
-        if (users == null) return;
-
-        if (user.getId() != null) {
-            users = users.stream()
-                    .filter(user1 -> !Objects.equals(user1.getId(), user.getId()))
-                    .collect(Collectors.toList());
-        }
-
-        List<String> emails = users.stream()
-                .map(User::getEmail)
-                .collect(Collectors.toList());
-
-        if (emails.contains(user.getEmail()))
-            throw new NotUniqueEmailException("Пользователь с таким Email уже существует");
+    public void checkExistUser(long id) {
+        if (!userRepository.existsById(id)) throw new NotFoundException("Пользователя с таким id не существует");
     }
 
     private void validateUser(User user) {
