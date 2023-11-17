@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 
 public abstract class BookingMapper {
 
-    public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    public final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     public static Booking toBookingFromRequestsDto(BookingRequestDto bookingRequestDto) {
         User booker = new User();
