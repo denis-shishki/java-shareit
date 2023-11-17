@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public class ItemMapper {
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final BookingMapper bookingMapper;
 
     public ItemDto toItemDto(Item item) {
         List<Comment> comments = commentRepository.findAllByItemId(item.getId());
@@ -86,10 +87,10 @@ public class ItemMapper {
                         .orElse(null);
 
                 if (lastBooking != null) {
-                    itemForOwner.setLastBooking(BookingMapper.toBookingForOwnerByItem(lastBooking));
+                    itemForOwner.setLastBooking(bookingMapper.toBookingForOwnerByItem(lastBooking));
                 }
                 if (nextBooking != null) {
-                    itemForOwner.setNextBooking(BookingMapper.toBookingForOwnerByItem(nextBooking));
+                    itemForOwner.setNextBooking(bookingMapper.toBookingForOwnerByItem(nextBooking));
                 }
             }
         }

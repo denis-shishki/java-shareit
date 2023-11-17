@@ -1,6 +1,6 @@
 package ru.practicum.shareit.booking;
 
-import lombok.RequiredArgsConstructor;
+import lombok.Data;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+@Data
 public class BookingService {
 
     private final BookingRepository bookingRepository;
@@ -28,10 +28,12 @@ public class BookingService {
 
     private final ItemRepository itemRepository;
 
+    private final BookingMapper bookingMapper;
+
     public BookingResponseDto createBooking(BookingRequestDto bookingRequestDto, Long userId) {
         checkValidateBooking(bookingRequestDto, userId);
-        Booking booking = BookingMapper.toBookingFromRequestsDto(bookingRequestDto);
-        return BookingMapper.toResponseBookingDto(bookingRepository.save(booking));
+        Booking booking = bookingMapper.toBookingFromRequestsDto(bookingRequestDto);
+        return bookingMapper.toResponseBookingDto(bookingRepository.save(booking));
     }
 
     public BookingResponseDto updateStatusBooking(long userId,
@@ -59,7 +61,7 @@ public class BookingService {
             booking.setStatusBooking(StatusBooking.REJECTED);
         }
 
-        return BookingMapper.toResponseBookingDto(bookingRepository.save(booking));
+        return bookingMapper.toResponseBookingDto(bookingRepository.save(booking));
     }
 
     public void checkExistBooking(long bookingId) {
@@ -74,7 +76,7 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow();
 
         if (booking.getBooker().getId() == userId || booking.getItem().getOwner().getId() == userId) {
-            return BookingMapper.toResponseBookingDto(booking);
+            return bookingMapper.toResponseBookingDto(booking);
         } else {
             throw new NotFoundException("У вас нет бронирований с запрашиваемым предметом");
         }
@@ -85,7 +87,7 @@ public class BookingService {
         List<Booking> booking = bookingRepository.findAllByBookerIdIs(userId);
 
         return sortedBookings(booking, state).stream()
-                .map(BookingMapper::toResponseBookingDto)
+                .map(bookingMapper::toResponseBookingDto)
                 .collect(Collectors.toList());
     }
 
@@ -94,7 +96,7 @@ public class BookingService {
         List<Booking> booking = bookingRepository.findAllBookingsByItemsOwner(userId);
 
         return sortedBookings(booking, state).stream()
-                .map(BookingMapper::toResponseBookingDto)
+                .map(bookingMapper::toResponseBookingDto)
                 .collect(Collectors.toList());
     }
 
@@ -154,8 +156,8 @@ public class BookingService {
             throw new ValidationException("Не указан период аренды");
         }
 
-        LocalDateTime start = LocalDateTime.parse(bookingDto.getStart(), BookingMapper.formatter);
-        LocalDateTime end = LocalDateTime.parse(bookingDto.getEnd(), BookingMapper.formatter);
+        LocalDateTime start = LocalDateTime.parse(bookingDto.getStart(), bookingMapper.getFormatter());
+        LocalDateTime end = LocalDateTime.parse(bookingDto.getEnd(), bookingMapper.getFormatter());
 
         if (start.isAfter(end) || start.equals(end)) {
             throw new ValidationException("Время начала использования не может быть позже или равен времени окончания");
