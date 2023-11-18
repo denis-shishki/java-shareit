@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
@@ -9,6 +10,7 @@ import javax.persistence.*;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "items")
 public class Item {
@@ -33,8 +35,4 @@ public class Item {
     @OneToOne(optional = true)
     @JoinColumn(name = "item_Request_id")
     private ItemRequest itemRequest;
-
-    public Item() {
-
-    }
 }

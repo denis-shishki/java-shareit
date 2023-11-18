@@ -2,12 +2,14 @@ package ru.practicum.shareit.item.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@NoArgsConstructor
 @Data
 @AllArgsConstructor
 @Table(name = "comments")
@@ -31,7 +33,4 @@ public class Comment {
     @Column(name = "created")
     private LocalDateTime created;
 
-    public Comment() {
-
-    }
 }
