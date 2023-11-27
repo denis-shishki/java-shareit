@@ -14,9 +14,9 @@ public interface BookingService {
 
     BookingResponseDto findBooking(long userId, long bookingId);
 
-    List<BookingResponseDto> findBookingsByUser(long userId, String state);
+    List<BookingResponseDto> findBookingsByUser(long userId, String state, Integer from, Integer size);
 
-    List<BookingResponseDto> findAllBookingsByItemsOwner(long userId, String state);
+    List<BookingResponseDto> findAllBookingsByItemsOwner(long userId, String state, Integer from, Integer size);
 
     void checkValidateBooking(BookingRequestDto bookingDto, long userId);
 }

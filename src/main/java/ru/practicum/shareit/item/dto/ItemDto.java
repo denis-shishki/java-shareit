@@ -2,19 +2,33 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import ru.practicum.shareit.request.model.ItemRequest;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class ItemDto {
-    protected final Long id;
+    protected Long id;
     protected Long ownerId;
-    protected final String name;
-    protected final String description;
-    protected final Boolean available;
-    protected final ItemRequest itemRequest;
+    protected String name;
+    protected String description;
+    protected Boolean available;
+    protected Long requestId;
     protected List<CommentDto> comments;
+
+    public ItemDto(Long id, String name, String description, Boolean available) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.available = available;
+    }
+
+    public ItemDto(String name, String description, Boolean available) {
+        this.name = name;
+        this.description = description;
+        this.available = available;
+    }
 }

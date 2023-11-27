@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking;
 
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
@@ -10,6 +12,7 @@ import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.ItemService;
+import ru.practicum.shareit.paginator.Paginator;
 import ru.practicum.shareit.user.UserService;
 
 import java.time.LocalDateTime;
@@ -17,7 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Data
+@RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
@@ -82,56 +85,52 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    public List<BookingResponseDto> findBookingsByUser(long userId, String state) {
+    public List<BookingResponseDto> findBookingsByUser(long userId, String state, Integer from, Integer size) {
+        Pageable pageable = Paginator.getPageable(from, size, "endBooking");
         userService.checkExistUser(userId);
-        List<Booking> booking = bookingRepository.findAllByBookerIdIs(userId);
+        Page<Booking> booking = bookingRepository.findAllByBookerIdIs(userId, pageable);
 
         return sortedBookings(booking, state).stream()
                 .map(bookingMapper::toResponseBookingDto)
                 .collect(Collectors.toList());
     }
 
-    public List<BookingResponseDto> findAllBookingsByItemsOwner(long userId, String state) {
+    public List<BookingResponseDto> findAllBookingsByItemsOwner(long userId, String state, Integer from, Integer size) {
+        Pageable pageable = Paginator.getPageable(from, size, "endBooking");
         userService.checkExistUser(userId);
-        List<Booking> booking = bookingRepository.findAllBookingsByItemsOwner(userId);
+        Page<Booking> booking = bookingRepository.findAllBookingsByItemsOwner(userId, pageable);
 
         return sortedBookings(booking, state).stream()
                 .map(bookingMapper::toResponseBookingDto)
                 .collect(Collectors.toList());
     }
 
-    private List<Booking> sortedBookings(List<Booking> bookings, String state) {
+    private List<Booking> sortedBookings(Page<Booking> bookings, String state) {
         LocalDateTime now = LocalDateTime.now();
 
         switch (state) {
             case "ALL":
                 return bookings.stream()
-                        .sorted((b1, b2) -> b2.getStartBooking().compareTo(b1.getStartBooking()))
                         .collect(Collectors.toList());
             case "CURRENT":
                 return bookings.stream()
                         .filter(b -> now.isAfter(b.getStartBooking()) && now.isBefore(b.getEndBooking()))
-                        .sorted((b1, b2) -> b2.getStartBooking().compareTo(b1.getStartBooking()))
                         .collect(Collectors.toList());
             case "PAST":
                 return bookings.stream()
                         .filter(b -> now.isAfter(b.getEndBooking()))
-                        .sorted((b1, b2) -> b2.getStartBooking().compareTo(b1.getStartBooking()))
                         .collect(Collectors.toList());
             case "FUTURE":
                 return bookings.stream()
                         .filter(b -> now.isBefore(b.getStartBooking()))
-                        .sorted((b1, b2) -> b2.getStartBooking().compareTo(b1.getStartBooking()))
                         .collect(Collectors.toList());
             case "WAITING":
                 return bookings.stream()
                         .filter(b -> b.getStatusBooking() == StatusBooking.WAITING)
-                        .sorted((b1, b2) -> b2.getStartBooking().compareTo(b1.getStartBooking()))
                         .collect(Collectors.toList());
             case "REJECTED":
                 return bookings.stream()
                         .filter(b -> b.getStatusBooking() == StatusBooking.REJECTED)
-                        .sorted((b1, b2) -> b2.getStartBooking().compareTo(b1.getStartBooking()))
                         .collect(Collectors.toList());
             default:
                 throw new ValidationException("Unknown state: " + state);

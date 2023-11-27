@@ -7,6 +7,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class UserDto {
     private Long id;
-    private final String name;
-    private final String email;
+    private String name;
+    private String email;
 }
