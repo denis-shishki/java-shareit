@@ -1,7 +1,8 @@
 package ru.practicum.shareit.booking;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingForOwnerByItem;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
@@ -15,13 +16,14 @@ import ru.practicum.shareit.user.model.User;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-@Service
+@Component
 @Data
+@AllArgsConstructor
 public class BookingMapper {
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
-    public Booking toBookingFromRequestsDto(BookingRequestDto bookingRequestDto, long userId) {
+    public static Booking toBookingFromRequestsDto(BookingRequestDto bookingRequestDto, long userId) {
         User booker = new User();
         Item item = new Item();
 
@@ -39,7 +41,7 @@ public class BookingMapper {
         return booking;
     }
 
-    public BookingResponseDto toResponseBookingDto(Booking booking) {
+    public static BookingResponseDto toResponseBookingDto(Booking booking) {
         UserShort owner = new UserShort(booking.getBooker().getId(),
                 booking.getBooker().getName());
         ItemForBooking item = new ItemForBooking(booking.getItem().getId(),
@@ -53,7 +55,7 @@ public class BookingMapper {
                 booking.getStatusBooking());
     }
 
-    public BookingForOwnerByItem toBookingForOwnerByItem(Booking booking) {
+    public static BookingForOwnerByItem toBookingForOwnerByItem(Booking booking) {
         return new BookingForOwnerByItem(booking.getId(),
                 formatter.format(booking.getStartBooking()),
                 formatter.format(booking.getEndBooking()),

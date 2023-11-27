@@ -10,13 +10,9 @@ public interface BookingService {
 
     BookingResponseDto updateStatusBooking(long userId, long bookingId, Boolean approved);
 
-    void checkExistBooking(long bookingId);
-
     BookingResponseDto findBooking(long userId, long bookingId);
 
-    List<BookingResponseDto> findBookingsByUser(long userId, String state);
+    List<BookingResponseDto> findBookingsByUser(long userId, String state, Integer from, Integer size);
 
-    List<BookingResponseDto> findAllBookingsByItemsOwner(long userId, String state);
-
-    void checkValidateBooking(BookingRequestDto bookingDto, long userId);
+    List<BookingResponseDto> findAllBookingsByItemsOwner(long userId, String state, Integer from, Integer size);
 }

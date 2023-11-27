@@ -37,4 +37,9 @@ public class Booking {
     @Column(name = "status_booking")
     @Enumerated(EnumType.STRING)
     private StatusBooking statusBooking;
+
+    public Booking(LocalDateTime endBooking, StatusBooking statusBooking) {
+        this.endBooking = endBooking;
+        this.statusBooking = statusBooking;
+    }
 }

@@ -2,6 +2,8 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.model.Booking;
@@ -10,9 +12,11 @@ import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemForRequest;
 import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.paginator.Paginator;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.model.User;
@@ -87,19 +91,22 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemWithBookingsDto> findAllItemForOwner(long userId) {
+    public List<ItemWithBookingsDto> findAllItemForOwner(long userId, Integer from, Integer size) {
+        Pageable pageable = Paginator.getPageable(from, size);
+
         userService.checkExistUser(userId);
-        List<Item> items = itemRepository.findItemByOwnerId(userId);
+        Page<Item> items = itemRepository.findItemByOwnerId(userId, pageable);
         return items.stream()
                 .map(item -> itemMapper.toItemForOwnerByItemDto(item, true))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<ItemDto> searchAvailableItem(String text) {
+    public List<ItemDto> searchAvailableItem(String text, Integer from, Integer size) {
+        Pageable pageable = Paginator.getPageable(from, size);
         if (text == null || text.isBlank()) return new ArrayList<>();
 
-        return itemRepository.searchByNameAndDescriptionAndAvailable(text)
+        return itemRepository.searchByNameAndDescriptionAndAvailable(text, pageable)
                 .stream()
                 .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
@@ -127,6 +134,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public CommentDto createComment(CommentDto commentDto, Long userId, Long itemId) {
         checkValidateComment(commentDto);
+        commentDto.setCreated(LocalDateTime.now());
         checkExistItem(itemId);
         userService.checkExistUser(userId);
 
@@ -147,12 +155,19 @@ public class ItemServiceImpl implements ItemService {
         return commentDto;
     }
 
+    @Override
+    public List<ItemForRequest> findItemForRequest(long requestId) {
+        List<Item> items = itemRepository.findAllByItemRequest_id(requestId);
+        return items.stream()
+                .map(itemMapper::toItemForRequest)
+                .collect(Collectors.toList());
+    }
+
     private void checkValidateComment(CommentDto commentDto) {
         if (commentDto.getText() == null || commentDto.getText().isBlank()) {
             log.error("Ошибка добавления комментария");
             throw new ValidationException("Комментарий не может быть пустым.");
         }
-        commentDto.setCreated(LocalDateTime.now());
     }
 
     private void checkValidateItem(ItemDto item) {

@@ -1,14 +1,15 @@
 package ru.practicum.shareit.item.dto;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.shareit.booking.dto.BookingForOwnerByItem;
-import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class ItemWithBookingsDto extends ItemDto {
 
     private BookingForOwnerByItem lastBooking;
@@ -20,7 +21,7 @@ public class ItemWithBookingsDto extends ItemDto {
                                String name,
                                String description,
                                Boolean available,
-                               ItemRequest itemRequest,
+                               Long itemRequest,
                                List<CommentDto> commentsDto) {
         super(id, ownerId, name, description, available, itemRequest, commentsDto);
     }

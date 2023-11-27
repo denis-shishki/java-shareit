@@ -23,10 +23,4 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse notUniqueEmailExceptionException(final NotUniqueEmailException e) {
-        log.warn("notUniqueEmail exception: ", e);
-        return new ErrorResponse(e.getMessage());
-    }
 }
