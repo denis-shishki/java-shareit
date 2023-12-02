@@ -96,6 +96,17 @@ class ItemServiceImplTest {
     }
 
     @Test
+    public void updateItem_whenUserIdNonExist_thenUserNotFoundExceptionThrow() {
+        long userId = 0L;
+        long itemId = 1L;
+
+        doThrow(NotFoundException.class).when(userService).checkExistUser(userId);
+
+        assertThrows(NotFoundException.class, () -> itemService.updateItem(new ItemDto(), userId, itemId));
+        verify(itemRepository, never()).save(Mockito.any(Item.class));
+    }
+
+    @Test
     public void updateItem_whenItemWithNewName_thenItemNotFoundExceptionThrow() {
         long itemId = 1L;
         long userId = 2L;
@@ -113,17 +124,6 @@ class ItemServiceImplTest {
 
         ItemDto checkResponseItem = itemService.updateItem(itemRequest, userId, itemId);
         assertEquals(checkResponseItem, responseItem);
-    }
-
-    @Test
-    public void updateItem_whenUserIdNonExist_thenUserNotFoundExceptionThrow() {
-        long userId = 0L;
-        long itemId = 1L;
-
-        doThrow(NotFoundException.class).when(userService).checkExistUser(userId);
-
-        assertThrows(NotFoundException.class, () -> itemService.updateItem(new ItemDto(), userId, itemId));
-        verify(itemRepository, never()).save(Mockito.any(Item.class));
     }
 
     @Test
