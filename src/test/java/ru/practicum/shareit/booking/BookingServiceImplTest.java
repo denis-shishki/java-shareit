@@ -21,6 +21,7 @@ import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.paginator.Paginator;
+import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
@@ -35,6 +36,8 @@ import static org.mockito.Mockito.when;
 class BookingServiceImplTest {
     @Mock
     private BookingRepository bookingRepository;
+    @Mock
+    private UserService userService;
     @Mock
     private ItemService itemService;
     @Mock
