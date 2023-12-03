@@ -1,16 +1,15 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.constants.StatusBooking;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
-import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.paginator.Paginator;
 import ru.practicum.shareit.user.UserService;
@@ -29,15 +28,17 @@ public class BookingServiceImpl implements BookingService {
 
     private final ItemService itemService;
 
-    private final ItemRepository itemRepository;
 
-
+    @Transactional
+    @Override
     public BookingResponseDto createBooking(BookingRequestDto bookingRequestDto, long userId) {
         checkValidateBooking(bookingRequestDto, userId);
         Booking booking = BookingMapper.toBookingFromRequestsDto(bookingRequestDto, userId);
         return BookingMapper.toResponseBookingDto(bookingRepository.save(booking));
     }
 
+    @Transactional
+    @Override
     public BookingResponseDto updateStatusBooking(long userId,
                                                   long bookingId,
                                                   Boolean approved) {
@@ -66,6 +67,8 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapper.toResponseBookingDto(bookingRepository.save(booking));
     }
 
+    @Transactional
+    @Override
     public BookingResponseDto findBooking(long userId, long bookingId) {
         checkExistBooking(bookingId);
         userService.checkExistUser(userId);
@@ -78,33 +81,36 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+    @Transactional
+    @Override
     public List<BookingResponseDto> findBookingsByUser(long userId, String state, Integer from, Integer size) {
         Pageable pageable = Paginator.getPageable(from, size, "endBooking");
         userService.checkExistUser(userId);
-        Page<Booking> booking = bookingRepository.findAllByBookerIdIs(userId, pageable);
+        List<Booking> booking = bookingRepository.findAllByBookerIdIs(userId, pageable);
 
         return sortedBookings(booking, state.toUpperCase()).stream()
                 .map(BookingMapper::toResponseBookingDto)
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    @Override
     public List<BookingResponseDto> findAllBookingsByItemsOwner(long userId, String state, Integer from, Integer size) {
         Pageable pageable = Paginator.getPageable(from, size, "endBooking");
         userService.checkExistUser(userId);
-        Page<Booking> booking = bookingRepository.findAllBookingsByItemsOwner(userId, pageable);
+        List<Booking> booking = bookingRepository.findAllBookingsByItemsOwner(userId, pageable);
 
         return sortedBookings(booking, state.toUpperCase()).stream()
                 .map(BookingMapper::toResponseBookingDto)
                 .collect(Collectors.toList());
     }
 
-    private List<Booking> sortedBookings(Page<Booking> bookings, String state) {
+    private List<Booking> sortedBookings(List<Booking> bookings, String state) {
         LocalDateTime now = LocalDateTime.now();
 
         switch (state) {
             case "ALL":
-                return bookings.stream()
-                        .collect(Collectors.toList());
+                return bookings;
             case "CURRENT":
                 return bookings.stream()
                         .filter(b -> now.isAfter(b.getStartBooking()) && now.isBefore(b.getEndBooking()))
@@ -139,7 +145,7 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundException("Владелец не может забронировать собственную вещь");
         }
 
-        if (!itemRepository.existsItemByIdAndAvailableIsTrue(bookingDto.getItemId())) {
+        if (!itemService.existsItemByIdAndAvailableIsTrue(bookingDto.getItemId())) {
             throw new ValidationException("Запрашиваемая вещь уже занята");
         }
 

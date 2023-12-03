@@ -27,4 +27,6 @@ public interface ItemService {
     CommentDto createComment(CommentDto commentDto, Long userId, Long itemId);
 
     List<ItemForRequest> findItemForRequest(long requestId);
+
+    boolean existsItemByIdAndAvailableIsTrue(long bookingId);
 }

@@ -12,8 +12,6 @@ import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
-import javax.transaction.Transactional;
-
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,7 +27,6 @@ class ItemRepositoryTest {
     RequestRepository requestRepository;
 
     @Test
-    @Transactional
     void findItemByOwnerId() {
         User userFirst = userRepository.save(new User(null, "name", "email@"));
         Item itemFirst = itemRepository.save(new Item(null, userFirst, "name", "description", true));
@@ -44,7 +41,6 @@ class ItemRepositoryTest {
     }
 
     @Test
-    @Transactional
     void searchByNameAndDescriptionAndAvailable() {
         User userFirst = userRepository.save(new User(null, "name", "email@"));
         Item itemFirst = itemRepository.save(new Item(null, userFirst, "вещь", "description", true));
@@ -60,7 +56,6 @@ class ItemRepositoryTest {
     }
 
     @Test
-    @Transactional
     void existsItemByIdAndAvailableIsTrue_whenItemExistAndAvailableIsTrue_thenReturnTrue() {
         User userFirst = userRepository.save(new User(null, "name", "email@"));
         Item itemFirst = itemRepository.save(new Item(null, userFirst, "вещь", "description", true));
@@ -72,7 +67,6 @@ class ItemRepositoryTest {
     }
 
     @Test
-    @Transactional
     void existsItemByIdAndAvailableIsTrue_whenItemNonExist_thenReturnFalse() {
         User userFirst = userRepository.save(new User(null, "name", "email@"));
         Item itemFirst = itemRepository.save(new Item(null, userFirst, "вещь", "description", true));
@@ -84,7 +78,6 @@ class ItemRepositoryTest {
     }
 
     @Test
-    @Transactional
     void existsItemByIdAndAvailableIsTrue_whenItemExistAndAvailableIsFalse_thenReturnFalse() {
         User userFirst = userRepository.save(new User(null, "name", "email@"));
         Item itemFirst = itemRepository.save(new Item(null, userFirst, "вещь", "description", true));
@@ -96,7 +89,6 @@ class ItemRepositoryTest {
     }
 
     @Test
-    @Transactional
     void existsItemByIdAndOwnerId_whenItemByOwner_thenReturnTrue() {
         User userFirst = userRepository.save(new User(null, "name", "email@"));
         Item itemFirst = itemRepository.save(new Item(null, userFirst, "вещь", "description", true));
@@ -110,7 +102,6 @@ class ItemRepositoryTest {
     }
 
     @Test
-    @Transactional
     void existsItemByIdAndOwnerId_whenItemNonByOwner_thenReturnFalse() {
         User userFirst = userRepository.save(new User(null, "name", "email@"));
         Item itemFirst = itemRepository.save(new Item(null, userFirst, "вещь", "description", true));
@@ -124,7 +115,6 @@ class ItemRepositoryTest {
     }
 
     @Test
-    @Transactional
     void findAllByItemRequest_id() {
         User userFirst = userRepository.save(new User(null, "name", "email@"));
         User userSecond = userRepository.save(new User(null, "name", "new email@"));

@@ -6,9 +6,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
@@ -65,7 +62,7 @@ class BookingServiceImplTest {
         Booking booking = new Booking(4L, startLocalDateTime, endLocalDataTime, booker, item, StatusBooking.APPROVED);
 
         when(itemService.findItem(itemId)).thenReturn(itemDto);
-        when(itemRepository.existsItemByIdAndAvailableIsTrue(itemId)).thenReturn(true);
+        when(itemService.existsItemByIdAndAvailableIsTrue(itemId)).thenReturn(true);
         when(bookingRepository.save(Mockito.any(Booking.class))).thenReturn(booking);
 
         BookingResponseDto response = bookingService.createBooking(requestDto, userId);
@@ -96,7 +93,7 @@ class BookingServiceImplTest {
         itemDto.setOwnerId(ownerId);
 
         when(itemService.findItem(itemId)).thenReturn(itemDto);
-        when(itemRepository.existsItemByIdAndAvailableIsTrue(itemId)).thenReturn(false);
+        when(itemService.existsItemByIdAndAvailableIsTrue(itemId)).thenReturn(false);
 
         assertThrows(ValidationException.class, () -> bookingService.createBooking(requestDto, userId));
     }
@@ -111,7 +108,7 @@ class BookingServiceImplTest {
         itemDto.setOwnerId(ownerId);
 
         when(itemService.findItem(itemId)).thenReturn(itemDto);
-        when(itemRepository.existsItemByIdAndAvailableIsTrue(itemId)).thenReturn(true);
+        when(itemService.existsItemByIdAndAvailableIsTrue(itemId)).thenReturn(true);
 
         assertThrows(ValidationException.class, () -> bookingService.createBooking(requestDto, userId));
     }
@@ -126,7 +123,7 @@ class BookingServiceImplTest {
         itemDto.setOwnerId(ownerId);
 
         when(itemService.findItem(itemId)).thenReturn(itemDto);
-        when(itemRepository.existsItemByIdAndAvailableIsTrue(itemId)).thenReturn(true);
+        when(itemService.existsItemByIdAndAvailableIsTrue(itemId)).thenReturn(true);
 
         assertThrows(ValidationException.class, () -> bookingService.createBooking(requestDto, userId));
     }
@@ -142,7 +139,7 @@ class BookingServiceImplTest {
         itemDto.setOwnerId(ownerId);
 
         when(itemService.findItem(itemId)).thenReturn(itemDto);
-        when(itemRepository.existsItemByIdAndAvailableIsTrue(itemId)).thenReturn(true);
+        when(itemService.existsItemByIdAndAvailableIsTrue(itemId)).thenReturn(true);
 
         assertThrows(ValidationException.class, () -> bookingService.createBooking(requestDto, userId));
     }
@@ -290,9 +287,8 @@ class BookingServiceImplTest {
         Booking bookingFirst = new Booking(bookingId, startLocalDateTime, endLocalDataTime, user, item, StatusBooking.WAITING);
         Booking bookingSecond = new Booking(bookingId, startLocalDateTime.plusHours(2), endLocalDataTime.plusHours(2), user, item, StatusBooking.WAITING);
         List<Booking> bookings = List.of(bookingFirst, bookingSecond);
-        Page<Booking> itemPage = new PageImpl<>(bookings, PageRequest.of(0, 10), bookings.size());
 
-        when(bookingRepository.findAllByBookerIdIs(userId, pageable)).thenReturn(itemPage);
+        when(bookingRepository.findAllByBookerIdIs(userId, pageable)).thenReturn(bookings);
 
         List<BookingResponseDto> response = bookingService.findBookingsByUser(userId, state, from, size);
         assertEquals(bookings.size(), response.size());
@@ -313,9 +309,8 @@ class BookingServiceImplTest {
         Booking bookingFirst = new Booking(bookingId, start, endLocalDataTime, user, item, StatusBooking.WAITING);
         Booking bookingSecond = new Booking(bookingId, startLocalDateTime.plusHours(2), endLocalDataTime.plusHours(2), user, item, StatusBooking.WAITING);
         List<Booking> bookings = List.of(bookingFirst, bookingSecond);
-        Page<Booking> itemPage = new PageImpl<>(bookings, PageRequest.of(0, 10), bookings.size());
 
-        when(bookingRepository.findAllByBookerIdIs(userId, pageable)).thenReturn(itemPage);
+        when(bookingRepository.findAllByBookerIdIs(userId, pageable)).thenReturn(bookings);
 
         List<BookingResponseDto> response = bookingService.findBookingsByUser(userId, state, from, size);
         assertEquals(1, response.size());
@@ -337,9 +332,8 @@ class BookingServiceImplTest {
         Booking bookingFirst = new Booking(bookingId, start, end, user, item, StatusBooking.WAITING);
         Booking bookingSecond = new Booking(bookingId, startLocalDateTime.plusHours(2), endLocalDataTime.plusHours(2), user, item, StatusBooking.WAITING);
         List<Booking> bookings = List.of(bookingFirst, bookingSecond);
-        Page<Booking> itemPage = new PageImpl<>(bookings, PageRequest.of(0, 10), bookings.size());
 
-        when(bookingRepository.findAllByBookerIdIs(userId, pageable)).thenReturn(itemPage);
+        when(bookingRepository.findAllByBookerIdIs(userId, pageable)).thenReturn(bookings);
 
         List<BookingResponseDto> response = bookingService.findBookingsByUser(userId, state, from, size);
         assertEquals(1, response.size());
@@ -361,9 +355,8 @@ class BookingServiceImplTest {
         Booking bookingFirst = new Booking(bookingId, start, end, user, item, StatusBooking.WAITING);
         Booking bookingSecond = new Booking(bookingId, startLocalDateTime.plusHours(2), endLocalDataTime.plusHours(2), user, item, StatusBooking.WAITING);
         List<Booking> bookings = List.of(bookingFirst, bookingSecond);
-        Page<Booking> itemPage = new PageImpl<>(bookings, PageRequest.of(0, 10), bookings.size());
 
-        when(bookingRepository.findAllByBookerIdIs(userId, pageable)).thenReturn(itemPage);
+        when(bookingRepository.findAllByBookerIdIs(userId, pageable)).thenReturn(bookings);
 
         List<BookingResponseDto> response = bookingService.findBookingsByUser(userId, state, from, size);
         assertEquals(1, response.size());
@@ -383,9 +376,8 @@ class BookingServiceImplTest {
         Booking bookingFirst = new Booking(bookingId, startLocalDateTime, endLocalDataTime, user, item, StatusBooking.WAITING);
         Booking bookingSecond = new Booking(bookingId, startLocalDateTime.plusHours(2), endLocalDataTime.plusHours(2), user, item, StatusBooking.WAITING);
         List<Booking> bookings = List.of(bookingFirst, bookingSecond);
-        Page<Booking> itemPage = new PageImpl<>(bookings, PageRequest.of(0, 10), bookings.size());
 
-        when(bookingRepository.findAllByBookerIdIs(userId, pageable)).thenReturn(itemPage);
+        when(bookingRepository.findAllByBookerIdIs(userId, pageable)).thenReturn(bookings);
 
         List<BookingResponseDto> response = bookingService.findBookingsByUser(userId, state, from, size);
         assertEquals(2, response.size());
@@ -405,9 +397,8 @@ class BookingServiceImplTest {
         Booking bookingFirst = new Booking(bookingId, startLocalDateTime, endLocalDataTime, user, item, StatusBooking.REJECTED);
         Booking bookingSecond = new Booking(bookingId, startLocalDateTime.plusHours(2), endLocalDataTime.plusHours(2), user, item, StatusBooking.REJECTED);
         List<Booking> bookings = List.of(bookingFirst, bookingSecond);
-        Page<Booking> itemPage = new PageImpl<>(bookings, PageRequest.of(0, 10), bookings.size());
 
-        when(bookingRepository.findAllByBookerIdIs(userId, pageable)).thenReturn(itemPage);
+        when(bookingRepository.findAllByBookerIdIs(userId, pageable)).thenReturn(bookings);
 
         List<BookingResponseDto> response = bookingService.findBookingsByUser(userId, state, from, size);
         assertEquals(2, response.size());
@@ -427,9 +418,8 @@ class BookingServiceImplTest {
         Booking bookingFirst = new Booking(bookingId, startLocalDateTime, endLocalDataTime, user, item, StatusBooking.REJECTED);
         Booking bookingSecond = new Booking(bookingId, startLocalDateTime.plusHours(2), endLocalDataTime.plusHours(2), user, item, StatusBooking.REJECTED);
         List<Booking> bookings = List.of(bookingFirst, bookingSecond);
-        Page<Booking> itemPage = new PageImpl<>(bookings, PageRequest.of(0, 10), bookings.size());
 
-        when(bookingRepository.findAllByBookerIdIs(userId, pageable)).thenReturn(itemPage);
+        when(bookingRepository.findAllByBookerIdIs(userId, pageable)).thenReturn(bookings);
 
         assertThrows(ValidationException.class, () -> bookingService.findBookingsByUser(userId, state, from, size));
     }
@@ -448,9 +438,8 @@ class BookingServiceImplTest {
         Booking bookingFirst = new Booking(bookingId, startLocalDateTime, endLocalDataTime, user, item, StatusBooking.WAITING);
         Booking bookingSecond = new Booking(bookingId, startLocalDateTime.plusHours(2), endLocalDataTime.plusHours(2), user, item, StatusBooking.WAITING);
         List<Booking> bookings = List.of(bookingFirst, bookingSecond);
-        Page<Booking> itemPage = new PageImpl<>(bookings, PageRequest.of(0, 10), bookings.size());
 
-        when(bookingRepository.findAllBookingsByItemsOwner(userId, pageable)).thenReturn(itemPage);
+        when(bookingRepository.findAllBookingsByItemsOwner(userId, pageable)).thenReturn(bookings);
 
         List<BookingResponseDto> response = bookingService.findAllBookingsByItemsOwner(userId, state, from, size);
         assertEquals(bookings.size(), response.size());

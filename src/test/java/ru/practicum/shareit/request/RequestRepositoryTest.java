@@ -13,7 +13,6 @@ import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -30,7 +29,6 @@ class RequestRepositoryTest {
     private ItemRepository itemRepository;
 
     @Test
-    @Transactional
     void findAllByRequestor_IdIs() {
         User userFirst = userRepository.save(new User(null, "name", "email@"));
         Item itemFirst = itemRepository.save(new Item(null, userFirst, "name", "description", true));
@@ -43,7 +41,6 @@ class RequestRepositoryTest {
     }
 
     @Test
-    @Transactional
     void findAllBySort() {
         User userFirst = userRepository.save(new User(null, "name", "email@"));
         User userSecond = userRepository.save(new User(null, "name", "new email@"));

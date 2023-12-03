@@ -3,7 +3,9 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.exceptions.NotUniqueEmailException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
@@ -19,12 +21,21 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    @Transactional
+    @Override
     public UserDto createUser(UserDto userDto) {
         User user = UserMapper.toUser(userDto);
         validateUser(user);
-        return UserMapper.toUserDto(userRepository.save(user));
+
+        try {
+            return UserMapper.toUserDto(userRepository.save(user));
+        } catch (Throwable throwable) {
+            throw new NotUniqueEmailException("Такая почта уже зарегистрирована");
+        }
     }
 
+    @Transactional
+    @Override
     public UserDto updateUser(UserDto userDto, long userId) {
         checkExistUser(userId);
         userDto.setId(userId);
@@ -40,15 +51,21 @@ public class UserServiceImpl implements UserService {
             user.setEmail(userUpdate.getEmail());
         }
 
-        return UserMapper.toUserDto(userRepository.save(user));
-
+        try {
+            return UserMapper.toUserDto(userRepository.save(user));
+        } catch (Throwable throwable) {
+            throw new NotUniqueEmailException("Такая почта уже зарегистрирована");
+        }
     }
 
+    @Transactional
+    @Override
     public void deleteUser(long id) {
         checkExistUser(id);
         userRepository.deleteById(id);
     }
 
+    @Transactional
     @Override
     public UserDto findUser(long id) {
         Optional<User> userOptional = userRepository.findById(id);
@@ -56,6 +73,7 @@ public class UserServiceImpl implements UserService {
         return UserMapper.toUserDto(userOptional.get());
     }
 
+    @Transactional
     @Override
     public List<UserDto> findAllUsers() {
         return userRepository.findAll().stream()

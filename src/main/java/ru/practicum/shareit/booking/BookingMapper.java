@@ -31,7 +31,7 @@ public class BookingMapper {
         item.setId(bookingRequestDto.getItemId());
 
         Booking booking = new Booking();
-        booking.setId(0L); //Если не добавить эту строку, то при сохранении в бд у нас возвращается объект Booking с User booker у которого пустое поле name. Это очень странно. Нужно ли Во всех сущностях ставить примитивные типы полей вместо оберток?
+        booking.setId(0L); //Если не добавить эту строку, то при сохранении в бд у нас возвращается объект Booking с User booker у которого пустое поле name
         booking.setStartBooking(LocalDateTime.parse(bookingRequestDto.getStart(), formatter));
         booking.setEndBooking(LocalDateTime.parse(bookingRequestDto.getEnd(), formatter));
         booking.setBooker(booker);

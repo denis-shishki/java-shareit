@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.ItemService;
@@ -24,6 +25,7 @@ public class RequestServiceImpl implements RequestService {
     private final RequestRepository requestRepository;
     private final ItemService itemService;
 
+    @Transactional
     @Override
     public RequestDto createRequest(long userId, RequestDto requestDto) {
         userService.checkExistUser(userId);
@@ -35,6 +37,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public List<ItemRequestForResponseDto> findAllRequestsForUser(long userId) {
         userService.checkExistUser(userId);
 
@@ -47,6 +50,7 @@ public class RequestServiceImpl implements RequestService {
         return requestForResponse;
     }
 
+    @Transactional
     @Override
     public List<ItemRequestForResponseDto> findAllRequests(long userId, Integer from, Integer size) {
         Pageable pageable = Paginator.getPageable(from, size, "created");
@@ -61,6 +65,7 @@ public class RequestServiceImpl implements RequestService {
         return requestsDto;
     }
 
+    @Transactional
     @Override
     public ItemRequestForResponseDto findRequestById(long requestId, long userId) {
         userService.checkExistUser(userId);

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.constants.StatusBooking;
@@ -44,6 +45,7 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper;
 
     @Override
+    @Transactional
     public ItemDto createItem(ItemDto itemDto, long userId) {
         checkValidateItem(itemDto);
         userService.checkExistUser(userId);
@@ -53,6 +55,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public ItemDto updateItem(ItemDto itemDto, long userId, long itemId) {
         userService.checkExistUser(userId);
         checkItemByUser(itemId, userId);
@@ -74,6 +77,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public ItemWithBookingsDto findItem(long itemId, long userId) {
         Optional<Item> itemOptional = itemRepository.findById(itemId);
         boolean isOwner = false;
@@ -91,6 +95,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public List<ItemWithBookingsDto> findAllItemForOwner(long userId, Integer from, Integer size) {
         Pageable pageable = Paginator.getPageable(from, size);
 
@@ -102,6 +107,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public List<ItemDto> searchAvailableItem(String text, Integer from, Integer size) {
         Pageable pageable = Paginator.getPageable(from, size);
         if (text == null || text.isBlank()) return new ArrayList<>();
@@ -113,6 +119,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public void checkItemByUser(long itemId, long userId) {
         if (!itemRepository.existsItemByIdAndOwnerId(itemId, userId)) {
             throw new NotFoundException("Запрашиваемая вещь отсутствует у данного пользователя");
@@ -132,6 +139,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public CommentDto createComment(CommentDto commentDto, Long userId, Long itemId) {
         checkValidateComment(commentDto);
         commentDto.setCreated(LocalDateTime.now());
@@ -161,6 +169,11 @@ public class ItemServiceImpl implements ItemService {
         return items.stream()
                 .map(itemMapper::toItemForRequest)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean existsItemByIdAndAvailableIsTrue(long bookingId) {
+        return itemRepository.existsItemByIdAndAvailableIsTrue(bookingId);
     }
 
     private void checkValidateComment(CommentDto commentDto) {
