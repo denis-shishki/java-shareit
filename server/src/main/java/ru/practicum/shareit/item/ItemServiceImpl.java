@@ -47,7 +47,6 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemDto createItem(ItemDto itemDto, long userId) {
-        checkValidateItem(itemDto);
         userService.checkExistUser(userId);
         itemDto.setOwnerId(userId);
         Item item = itemMapper.toItem(itemDto);
@@ -180,19 +179,6 @@ public class ItemServiceImpl implements ItemService {
         if (commentDto.getText() == null || commentDto.getText().isBlank()) {
             log.error("Ошибка добавления комментария");
             throw new ValidationException("Комментарий не может быть пустым.");
-        }
-    }
-
-    private void checkValidateItem(ItemDto item) {
-        if (item.getName() == null || item.getName().isBlank()) {
-            log.error("Ошибка добавления предмета.");
-            throw new ValidationException("Предмета вещи не может быть пустым");
-        } else if (item.getDescription() == null || item.getDescription().isBlank()) {
-            log.error("Ошибка добавления предмета.");
-            throw new ValidationException("Описание предмета не может быть пустым");
-        } else if (item.getAvailable() == null) {
-            log.error("Ошибка добавления предмета.");
-            throw new ValidationException("Необходимо выбрать статус для предмета");
         }
     }
 }

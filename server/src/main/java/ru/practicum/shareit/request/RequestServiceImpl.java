@@ -6,7 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.NotFoundException;
-import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.paginator.Paginator;
 import ru.practicum.shareit.request.dto.ItemRequestForResponseDto;
@@ -29,7 +28,6 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public RequestDto createRequest(long userId, RequestDto requestDto) {
         userService.checkExistUser(userId);
-        checkValidateResponse(requestDto);
 
         ItemRequest itemRequest = itemRequestMapper.toItemRequest(requestDto, userId);
 
@@ -92,11 +90,5 @@ public class RequestServiceImpl implements RequestService {
     private void addItemResponse(ItemRequestForResponseDto responseDto) {
         long requestId = responseDto.getId();
         responseDto.setItems(itemService.findItemForRequest(requestId));
-    }
-
-    protected void checkValidateResponse(RequestDto requestDto) {
-        if (requestDto.getDescription() == null || requestDto.getDescription().isBlank()) {
-            throw new ValidationException("Запрос не может быть пустым");
-        }
     }
 }

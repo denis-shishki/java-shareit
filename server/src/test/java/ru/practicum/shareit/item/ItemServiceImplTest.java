@@ -161,39 +161,6 @@ class ItemServiceImplTest {
     }
 
     @Test
-    public void createItem_whenItemWithoutName_thenValidationException() {
-        long userId = 1L;
-        String description = "description";
-        boolean available = true;
-        ItemDto itemDto = new ItemDto(null, description, available);
-
-        assertThrows(ValidationException.class, () -> itemService.createItem(itemDto, userId));
-        verify(itemRepository, never()).save(Mockito.any(Item.class));
-    }
-
-    @Test
-    public void createItem_whenItemWithoutDescription_thenValidationException() {
-        long userId = 1L;
-        String name = "name";
-        boolean available = true;
-        ItemDto itemDto = new ItemDto(name, null, available);
-
-        assertThrows(ValidationException.class, () -> itemService.createItem(itemDto, userId));
-        verify(itemRepository, never()).save(Mockito.any(Item.class));
-    }
-
-    @Test
-    public void createItem_whenItemWithoutAvailable_thenValidationException() {
-        long userId = 1L;
-        String name = "name";
-        String description = "description";
-        ItemDto itemDto = new ItemDto(name, description, null);
-
-        assertThrows(ValidationException.class, () -> itemService.createItem(itemDto, userId));
-        verify(itemRepository, never()).save(Mockito.any(Item.class));
-    }
-
-    @Test
     public void findItem_whenItemNotExist_thenNotFoundException() {
         long itemId = 1L;
         long userId = 2L;

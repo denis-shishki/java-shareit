@@ -25,7 +25,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto createUser(UserDto userDto) {
         User user = UserMapper.toUser(userDto);
-        validateUser(user);
 
         try {
             return UserMapper.toUserDto(userRepository.save(user));
@@ -85,13 +84,4 @@ public class UserServiceImpl implements UserService {
         if (!userRepository.existsById(id)) throw new NotFoundException("Пользователя с таким id не существует");
     }
 
-    private void validateUser(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            log.error("Ошибка добавления пользователя.");
-            throw new ValidationException("Имя пользователя не может быть пустым");
-        } else if (user.getEmail() == null || !user.getEmail().contains("@")) {
-            log.error("Ошибка добавления пользователя.");
-            throw new ValidationException("Электронная почта указана некорректно");
-        }
-    }
 }

@@ -46,9 +46,7 @@ public class BookingServiceImpl implements BookingService {
         checkExistBooking(bookingId);
         Booking booking = bookingRepository.findById(bookingId).orElseThrow();
 
-        if (approved == null) {
-            throw new ValidationException("Нужно указать необходимый статус для бронирования");
-        } else if (booking.getItem().getOwner().getId() != userId) {
+        if (booking.getItem().getOwner().getId() != userId) {
             throw new NotFoundException("Статус бронирования может менять только владелец вещи");
         }
 
@@ -147,19 +145,6 @@ public class BookingServiceImpl implements BookingService {
 
         if (!itemService.existsItemByIdAndAvailableIsTrue(bookingDto.getItemId())) {
             throw new ValidationException("Запрашиваемая вещь уже занята");
-        }
-
-//        if (bookingDto.getStart() == null || bookingDto.getEnd() == null) {
-//            throw new ValidationException("Не указан период аренды");
-//        }
-
-        LocalDateTime start = LocalDateTime.parse(bookingDto.getStart(), BookingMapper.formatter);
-        LocalDateTime end = LocalDateTime.parse(bookingDto.getEnd(), BookingMapper.formatter);
-
-        if (start.isAfter(end) || start.equals(end)) {
-            throw new ValidationException("Время начала использования не может быть позже или равен времени окончания");
-        } else if (start.isBefore(LocalDateTime.now())) {
-            throw new ValidationException("Начало использования не может быть в прошедшем времени");
         }
     }
 

@@ -10,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.exceptions.NotFoundException;
-import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemForRequest;
 import ru.practicum.shareit.request.dto.ItemRequestForResponseDto;
@@ -67,16 +66,6 @@ class RequestServiceImplTest {
         assertThrows(NotFoundException.class, () -> requestService.createRequest(0L, new RequestDto()));
 
         verify(requestRepository, never()).save(new ItemRequest());
-    }
-
-    @Test
-    void createRequest_whenUserNoValid_thenValidationException() {
-        RequestDto requestDto = new RequestDto();
-        long userId = 0L;
-
-        assertThrows(ValidationException.class, () -> requestService.createRequest(userId, requestDto));
-
-        verify(requestRepository, never()).save(Mockito.any(ItemRequest.class));
     }
 
     @Test

@@ -100,52 +100,6 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void createBooking_whenTimeIsNull_thenReturnValidationException() {
-        long itemId = 1L;
-        long userId = 2L;
-        long ownerId = 3L;
-        BookingRequestDto requestDto = new BookingRequestDto(null, null, itemId);
-        ItemWithBookingsDto itemDto = new ItemWithBookingsDto();
-        itemDto.setOwnerId(ownerId);
-
-        when(itemService.findItem(itemId)).thenReturn(itemDto);
-        when(itemService.existsItemByIdAndAvailableIsTrue(itemId)).thenReturn(true);
-
-        assertThrows(ValidationException.class, () -> bookingService.createBooking(requestDto, userId));
-    }
-
-    @Test
-    void createBooking_whenStartTimeEqualsTime_thenReturnValidationException() {
-        long itemId = 1L;
-        long userId = 2L;
-        long ownerId = 3L;
-        BookingRequestDto requestDto = new BookingRequestDto(startDataTime, startDataTime, itemId);
-        ItemWithBookingsDto itemDto = new ItemWithBookingsDto();
-        itemDto.setOwnerId(ownerId);
-
-        when(itemService.findItem(itemId)).thenReturn(itemDto);
-        when(itemService.existsItemByIdAndAvailableIsTrue(itemId)).thenReturn(true);
-
-        assertThrows(ValidationException.class, () -> bookingService.createBooking(requestDto, userId));
-    }
-
-    @Test
-    void createBooking_whenStartTimeBeforeNow_thenReturnValidationException() {
-        long itemId = 1L;
-        long userId = 2L;
-        long ownerId = 3L;
-        String startDataTimeBeforeNow = "2000-10-12T22:22:22";
-        BookingRequestDto requestDto = new BookingRequestDto(startDataTimeBeforeNow, endDataTime, itemId);
-        ItemWithBookingsDto itemDto = new ItemWithBookingsDto();
-        itemDto.setOwnerId(ownerId);
-
-        when(itemService.findItem(itemId)).thenReturn(itemDto);
-        when(itemService.existsItemByIdAndAvailableIsTrue(itemId)).thenReturn(true);
-
-        assertThrows(ValidationException.class, () -> bookingService.createBooking(requestDto, userId));
-    }
-
-    @Test
     void updateStatusBooking_whenRequestApprovedAndBookingNotApproved_thenReturnBooking() {
         long userId = 1L;
         long bookingId = 2L;
@@ -199,20 +153,6 @@ class BookingServiceImplTest {
         User user = new User(userId, "name", "description");
         Item item = new Item(itemId, user, "name", "description", true);
         Booking booking = new Booking(bookingId, startLocalDateTime, endLocalDataTime, user, item, StatusBooking.REJECTED);
-        when(bookingRepository.existsById(anyLong())).thenReturn(true);
-        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
-
-        assertThrows(ValidationException.class, () -> bookingService.updateStatusBooking(userId, bookingId, isApproved));
-    }
-
-    @Test
-    void updateStatusBooking_whenApprovedIsNull_thenReturnValidationException() {
-        long userId = 1L;
-        long bookingId = 2L;
-        Boolean isApproved = null;
-        User user = new User(userId, "name", "description");
-        Item item = new Item(itemId, user, "name", "description", true);
-        Booking booking = new Booking(bookingId, startLocalDateTime, endLocalDataTime, user, item, StatusBooking.WAITING);
         when(bookingRepository.existsById(anyLong())).thenReturn(true);
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
 

@@ -100,30 +100,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    public void createUser_whenUserEmptyName_thenValidationException() {
-        UserDto userRequest = new UserDto(null, null, "email@");
-
-        assertThrows(ValidationException.class, () -> userService.createUser(userRequest));
-        verify(userRepository, never()).save(Mockito.any(User.class));
-    }
-
-    @Test
-    public void createUser_whenUserEmptyEmail_thenValidationException() {
-        UserDto userRequest = new UserDto(null, "name", null);
-
-        assertThrows(ValidationException.class, () -> userService.createUser(userRequest));
-        verify(userRepository, never()).save(Mockito.any(User.class));
-    }
-
-    @Test
-    public void createUser_whenUserEmailNoValid_thenValidationException() {
-        UserDto userRequest = new UserDto(null, "name", "email");
-
-        assertThrows(ValidationException.class, () -> userService.createUser(userRequest));
-        verify(userRepository, never()).save(Mockito.any(User.class));
-    }
-
-    @Test
     public void deleteUser_whenUserIdExist() {
         long userId = 1L;
 

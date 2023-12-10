@@ -32,7 +32,7 @@ class ItemRequestMapperTest {
     void toResponseDto() {
         long itemId = 1L;
         String description = "description";
-        ItemRequest itemRequest = new ItemRequest(itemId,new User(), description, LocalDateTime.now());
+        ItemRequest itemRequest = new ItemRequest(itemId, new User(), description, LocalDateTime.now());
 
         ItemRequestForResponseDto itemRequestForResponseDto = itemRequestMapper.toResponseDto(itemRequest);
         assertEquals(itemRequestForResponseDto.getId(), itemId);
@@ -47,7 +47,7 @@ class ItemRequestMapperTest {
         LocalDateTime localDateTime = LocalDateTime.of(1999, 10, 12, 22, 22, 22);
         String dateTime = "1999-10-12T22:22:22";
 
-        ItemRequest itemRequest = new ItemRequest(itemId,new User(), description, localDateTime);
+        ItemRequest itemRequest = new ItemRequest(itemId, new User(), description, localDateTime);
 
         RequestDto requestDto = itemRequestMapper.toRequestDto(itemRequest);
         assertEquals(requestDto.getCreated(), dateTime);
