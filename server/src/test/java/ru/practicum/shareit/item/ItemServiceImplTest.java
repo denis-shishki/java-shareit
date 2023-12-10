@@ -6,9 +6,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.model.Booking;
@@ -199,26 +196,6 @@ class ItemServiceImplTest {
     }
 
     @Test
-    public void findAllItemForOwner_whenUserExist_thenReturnItems() {
-        long userId = 1L;
-        int from = 0;
-        int size = 10;
-        Pageable pageable = Paginator.getPageable(from, size);
-        List<Item> itemList = new ArrayList<>();
-        itemList.add(new Item());
-        itemList.add(new Item());
-        itemList.add(new Item());
-        Page<Item> itemPage = new PageImpl<>(itemList, PageRequest.of(0, 10), itemList.size());
-
-        when(itemRepository.findItemByOwnerId(userId, pageable)).thenReturn(itemPage);
-        when(itemMapper.toItemForOwnerByItemDto(Mockito.any(Item.class), anyBoolean())).thenReturn(new ItemWithBookingsDto());
-
-        List<ItemWithBookingsDto> response = itemService.findAllItemForOwner(userId, from, size);
-
-        assertEquals(response.size(), itemList.size());
-    }
-
-    @Test
     public void searchAvailableItem() {
         int from = 0;
         int size = 10;
@@ -228,10 +205,9 @@ class ItemServiceImplTest {
         itemList.add(new Item());
         itemList.add(new Item());
         itemList.add(new Item());
-        Page<Item> itemPage = new PageImpl<>(itemList, PageRequest.of(0, 10), itemList.size());
 
         when(itemMapper.toItemDto(Mockito.any(Item.class))).thenReturn(new ItemDto());
-        when(itemRepository.searchByNameAndDescriptionAndAvailable(text, pageable)).thenReturn(itemPage);
+        when(itemRepository.searchByNameAndDescriptionAndAvailable(text, pageable)).thenReturn(itemList);
 
         List<ItemDto> response = itemService.searchAvailableItem(text, from, size);
         assertEquals(itemList.size(), response.size());

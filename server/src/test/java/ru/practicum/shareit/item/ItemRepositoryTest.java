@@ -3,7 +3,6 @@ package ru.practicum.shareit.item;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.item.model.Item;
@@ -35,9 +34,9 @@ class ItemRepositoryTest {
         Item itemThird = itemRepository.save(new Item(null, userSecond, "name second", "description second", true));
         Pageable pageable = PageRequest.of(0, 10);
 
-        Page<Item> findItem = itemRepository.findItemByOwnerId(userFirst.getId(), pageable);
+        List<Item> findItem = itemRepository.findItemByOwnerId(userFirst.getId(), pageable);
 
-        assertEquals(findItem.getTotalElements(), 2);
+        assertEquals(findItem.size(), 2);
     }
 
     @Test
@@ -50,9 +49,9 @@ class ItemRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
         String text = "вещ";
 
-        Page<Item> findItem = itemRepository.searchByNameAndDescriptionAndAvailable(text, pageable);
+        List<Item> findItem = itemRepository.searchByNameAndDescriptionAndAvailable(text, pageable);
 
-        assertEquals(findItem.getTotalElements(), 2);
+        assertEquals(findItem.size(), 2);
     }
 
     @Test
