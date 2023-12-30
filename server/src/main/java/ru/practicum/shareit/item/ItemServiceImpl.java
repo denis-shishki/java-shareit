@@ -2,7 +2,6 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +23,7 @@ import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -90,7 +90,6 @@ public class ItemServiceImpl implements ItemService {
 
 
         return itemMapper.toItemForOwnerByItemDto(itemOptional.get(), isOwner);
-
     }
 
     @Override
@@ -99,9 +98,10 @@ public class ItemServiceImpl implements ItemService {
         Pageable pageable = Paginator.getPageable(from, size);
 
         userService.checkExistUser(userId);
-        Page<Item> items = itemRepository.findItemByOwnerId(userId, pageable);
+        List<Item> items = itemRepository.findItemByOwnerId(userId, pageable);
         return items.stream()
                 .map(item -> itemMapper.toItemForOwnerByItemDto(item, true))
+                .sorted(Comparator.comparing(ItemWithBookingsDto::getId))
                 .collect(Collectors.toList());
     }
 
